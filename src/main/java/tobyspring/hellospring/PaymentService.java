@@ -11,15 +11,19 @@ import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
-public abstract class PaymentService {
+public class PaymentService {
+    private final ExRateProvider exRateProvider;
+
+    public PaymentService(ExRateProvider exRateProvider) {
+        this.exRateProvider = exRateProvider;
+    }
+
     public Payment prepare(Long orderId, String currency, BigDecimal foreignCurrencyAmount) throws IOException {
-        BigDecimal exRate = getExRate(currency);
+        WebApiExRateProvider provider = new WebApiExRateProvider();
+        BigDecimal exRate = provider.getExRate(currency);
         BigDecimal convertedAmount = foreignCurrencyAmount.multiply(exRate);
         LocalDateTime validUntil = LocalDateTime.now().plusMinutes(30);
 
         return new Payment(orderId, currency, foreignCurrencyAmount, exRate, convertedAmount, validUntil);
     }
-
-    protected abstract BigDecimal getExRate(String currency) throws IOException;
-
 }
