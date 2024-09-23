@@ -15,8 +15,7 @@ public class PaymentService {
     }
 
     public Payment prepare(Long orderId, String currency, BigDecimal foreignCurrencyAmount) throws IOException {
-        WebApiExRateProvider provider = new WebApiExRateProvider();
-        BigDecimal exRate = provider.getExRate(currency);
+        BigDecimal exRate = exRateProvider.getExRate(currency);
         BigDecimal convertedAmount = foreignCurrencyAmount.multiply(exRate);
         LocalDateTime validUntil = LocalDateTime.now().plusMinutes(30);
 
